@@ -1,0 +1,26 @@
+/* stylelint-disable-next-line at-rule-allowed-list */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-teal: #2C7A7B;
+  --color-grey-dark: #1A202C;
+  --color-grey-medium: #4A5568;
+  --color-grey-light: #94A3B8;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
