@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <main className="min-h-screen">
           {children}
         </main>
@@ -31,4 +31,15 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   )
+  // src/app/layout.jsx
+
+    return (
+      <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+        <body className={inter.className} suppressHydrationWarning>
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </body>
+      </html>
+    );
 }
