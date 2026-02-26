@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   const socialLinks = [
-    { name: 'Instagram', href: 'https://instagram.com/freshianjeri' },
+    { name: 'Instagram', href: 'https://www.instagram.com/fwnjeri/' },
     { name: 'LinkedIn', href: 'https://linkedin.com/in/freshianjeri' },
     { name: 'Behance', href: 'https://behance.net/freshianjeri' },
   ]
