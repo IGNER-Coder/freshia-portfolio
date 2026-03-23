@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Freshia Art Portfolio
+
+This is a modern Art Portfolio web application built with [Next.js](https://nextjs.org). It showcases the artist's biography, artworks, exhibitions, techniques, and community education initiatives. The project features a beautifully designed user interface, responsive layout, and an inquiry system for interested collectors.
+
+This project was bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
