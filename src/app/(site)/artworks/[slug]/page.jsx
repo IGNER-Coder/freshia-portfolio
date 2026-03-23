@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { client } from '@/sanity/lib/client';
 import { urlFor } from '@/sanity/lib/image';
 import { notFound } from 'next/navigation';
+import InquiryModal from '../../../components/artworks/InquiryModal';
 
 // Get single artwork by slug
 async function getArtwork(slug) {
@@ -184,12 +185,7 @@ export default async function ArtworkDetailPage({ params }) {
             </div>
 
             <div className="pt-4">
-              <Link
-                href="/contact"
-                className="inline-block w-full text-center bg-slate-900 text-white px-8 py-4 font-sans text-xs font-bold uppercase tracking-widest hover:bg-teal-700 transition-colors duration-300"
-              >
-                Inquire About This Piece
-              </Link>
+              <InquiryModal artwork={artwork} />
             </div>
 
           </div>

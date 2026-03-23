@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
+import Link from 'next/link';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -149,19 +150,22 @@ export default function ContactForm() {
     <>
       {/* Success Message */}
       {submitStatus === 'success' && (
-        <div className="mb-8 p-6 bg-green-50 border-2 border-green-200">
-          <div className="flex items-start gap-3">
-            <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <div>
-              <p className="text-green-900 font-semibold mb-1">
-                Message sent successfully!
-              </p>
-              <p className="text-green-800 text-sm">
-                Thank you for reaching out, <strong>{formData.name || 'there'}</strong>. I'll respond to <strong>{formData.email || 'your email'}</strong> within 24-48 hours.
-              </p>
-            </div>
+        <div className="mb-8 p-8 bg-teal-50 border border-teal-200 text-center flex flex-col items-center justify-center min-h-[250px] shadow-sm">
+          <svg className="w-16 h-16 mb-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="font-serif text-2xl text-teal-900 mb-2">Message Delivered</h3>
+          <p className="font-sans text-sm font-light text-teal-800 mb-8 max-w-sm">
+            Thank you, <strong>{formData.name || 'friend'}</strong>. The studio has received your inquiry and will respond to <strong>{formData.email}</strong> shortly.
+          </p>
+          <div className="relative group overflow-hidden">
+            <Link 
+              href="/artworks"
+              className="group flex flex-col items-center gap-1 text-[10px] md:text-sm font-sans font-bold uppercase tracking-widest text-teal-900 transition-all hover:text-teal-700 relative py-2"
+            >
+              ← Continue Exploring Gallery
+              <span className="relative h-[2px] w-12 bg-teal-900 transition-all duration-300 group-hover:w-full group-hover:bg-teal-700 mt-1" />
+            </Link>
           </div>
         </div>
       )}

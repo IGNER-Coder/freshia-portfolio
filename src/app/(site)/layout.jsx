@@ -1,13 +1,13 @@
-import Header from '../components/Header'
+import GlobalNav from '../components/GlobalNav'
 
 export default function SiteLayout({ children }) {
   return (
     <>
-      {/* Header appears on all pages in (site) folder */}
-      <Header />
+      {/* Global Navigation replacing the disjointed Sidebar */}
+      <GlobalNav theme="dark" variant="inner" />
       
-      {/* Content with left margin for desktop vertical nav */}
-      <div className="md:ml-[60px]">
+      {/* Main Content Area */}
+      <div>
         {children}
       </div>
     </>
