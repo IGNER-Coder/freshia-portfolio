@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from 'framer-motion'
-import { CldImage } from 'next-cloudinary'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const fadeUp = {
@@ -40,8 +40,8 @@ export default function ArtistBiography() {
               className="w-full max-w-xs md:max-w-full aspect-[3/4] bg-white p-3 shadow-xl mb-4 mx-auto md:mx-0 -rotate-2 hover:rotate-0 transition-transform duration-700"
             >
               <div className="relative w-full h-full bg-slate-200 overflow-hidden">
-                <CldImage
-                  src="IMG_5801_gkh3yc"
+                <Image
+                  src="https://res.cloudinary.com/doevklqj6/image/upload/w_600,h_800,c_fill,g_face,q_auto,f_auto/IMG_5801_gkh3yc"
                   alt="Freshia Njeri — Studio Portrait, Wajukuu Arts Collective, Nairobi"
                   fill
                   className="object-cover grayscale hover:grayscale-0 transition-all duration-[1500ms]"
@@ -91,7 +91,7 @@ export default function ArtistBiography() {
           </motion.div>
 
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
-            I have had the honor of showcasing my work in esteemed venues — including Documenta 15 in Kassel, Germany (2022), "Before Our Home Goes Down" at Wajukuu (2024), and "Image in Our Heads" at Wajukuu and the Royal Danish Embassy (2025). These platforms have provided invaluable opportunities to connect with diverse audiences and fellow artists worldwide.
+            I have had the honor of showcasing my work in esteemed venues — including Documenta 15 in Kassel, Germany (2022), "Before Our Home Goes Down" at Wajukuu (2024), and "Image in Our Heads" at Wajukuu and the Royal Danish Embassy (2025).
           </motion.p>
 
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>

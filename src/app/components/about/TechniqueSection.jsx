@@ -1,21 +1,23 @@
-"use client" // Needed since CldImage is used
+import Image from 'next/image'
 
-import { CldImage } from 'next-cloudinary'
+const CDN = 'https://res.cloudinary.com/doevklqj6/image/upload/w_600,h_600,c_fill,q_auto,f_auto'
 
 export default function TechniqueSection() {
   return (
-    <section className="bg-slate-50 p-8 md:p-16 mb-32 -mx-6 md:mx-0 rounded-sm border border-slate-200/50">
+    <section className="bg-slate-50 p-8 md:p-16 mb-16 -mx-6 md:mx-0 rounded-sm border border-slate-200/50">
       <h3 className="font-serif text-4xl md:text-5xl mb-12">Technique & Approach</h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+
         <div className="flex flex-col gap-6">
           <div className="w-full aspect-square bg-white p-3 shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden group">
             <div className="relative w-full h-full overflow-hidden">
-              <CldImage
-                src="homepage-background_jabt7w" 
+              <Image
+                src={`${CDN}/homepage-background_jabt7w`}
                 alt="Macro texture detail"
                 fill
                 className="object-cover transition-transform duration-[2000ms] group-hover:scale-110 grayscale group-hover:grayscale-0"
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
               <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent transition-colors duration-500" />
             </div>
@@ -31,11 +33,12 @@ export default function TechniqueSection() {
         <div className="flex flex-col gap-6 md:pt-12">
           <div className="w-full aspect-square bg-white p-3 shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden group">
             <div className="relative w-full h-full overflow-hidden">
-              <CldImage
-                src="IMG_5801_gkh3yc" 
+              <Image
+                src={`${CDN}/IMG_5801_gkh3yc`}
                 alt="Color mixing detail"
                 fill
                 className="object-cover transition-transform duration-[2000ms] group-hover:scale-110 scale-125"
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
               <div className="absolute inset-0 bg-teal-900/40 group-hover:bg-teal-900/10 transition-colors duration-500 mix-blend-multiply" />
             </div>
@@ -51,11 +54,12 @@ export default function TechniqueSection() {
         <div className="flex flex-col gap-6">
           <div className="w-full aspect-square bg-white p-3 shadow-md hover:shadow-xl transition-all duration-500 overflow-hidden group border-b border-transparent">
             <div className="relative w-full h-full overflow-hidden">
-              <CldImage
-                src="homepage-background_jabt7w" 
+              <Image
+                src={`${CDN}/homepage-background_jabt7w`}
                 alt="Scraped canvas detail"
                 fill
                 className="object-cover transition-transform duration-[2000ms] group-hover:scale-125 rotate-180 grayscale contrast-125"
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
               <div className="absolute inset-0 bg-slate-100/10 group-hover:bg-transparent transition-colors duration-500" />
             </div>
@@ -67,6 +71,7 @@ export default function TechniqueSection() {
             </p>
           </div>
         </div>
+
       </div>
     </section>
   );
