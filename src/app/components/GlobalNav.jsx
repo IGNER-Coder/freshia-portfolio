@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { socialLinks } from '@/app/lib/socials'
 
 export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -18,7 +19,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
       const minutes = now.getMinutes().toString().padStart(2, '0')
       setCurrentTime(`${hours}:${minutes} EAT`)
     }
-    
+
     updateTime()
     const interval = setInterval(updateTime, 60000)
     return () => clearInterval(interval)
@@ -30,7 +31,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
         setScrolled(window.scrollY > 80)
       }
       window.addEventListener('scroll', handleScroll)
-      handleScroll() // trigger immediately if already scrolled
+      handleScroll()
       return () => window.removeEventListener('scroll', handleScroll)
     }
   }, [variant])
@@ -99,18 +100,18 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-900/5 z-[70] shadow-sm py-4 px-6 md:px-16"
             >
               <div className="max-w-7xl mx-auto flex items-center justify-between md:justify-center relative">
-                
-                {/* Desktop Menu - Exclusively the menus centered */}
+
+                {/* Desktop Menu */}
                 <nav className="hidden md:flex items-center gap-12">
                   {navItems.map((item) => {
                     const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
                     return (
-                      <Link 
-                        key={item.label} 
-                        href={item.href} 
+                      <Link
+                        key={item.label}
+                        href={item.href}
                         className={`text-xs md:text-sm tracking-widest uppercase font-bold transition-all duration-300 ${
-                          isActive 
-                            ? 'text-teal-700' 
+                          isActive
+                            ? 'text-teal-700'
                             : 'text-slate-500 hover:text-teal-800 hover:-translate-y-0.5'
                         }`}
                       >
@@ -120,7 +121,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
                   })}
                 </nav>
 
-                {/* Mobile Specific - Keeps hamburger functionality */}
+                {/* Mobile */}
                 <div className="md:hidden w-full flex items-center justify-between">
                   <span className="font-serif font-bold text-lg text-slate-900">FN</span>
                   <motion.button
@@ -141,7 +142,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
         </AnimatePresence>
       )}
 
-      {/* Full-Screen Menu Overlay (Always dark theme across whole site) */}
+      {/* Full-Screen Menu Overlay */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -189,15 +190,12 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.6, delay: 0.5 }} className="w-32 h-[1px] bg-white opacity-20 my-12" />
 
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex items-center space-x-8 text-sm text-white opacity-60">
-                {['Instagram', 'LinkedIn', 'Behance'].map((social) => {
-                  const username = social === 'Instagram' ? 'fwnjeri' : 'freshianjeri';
-                  return (
-                    <a key={social} href={`https://${social.toLowerCase()}.com/${username}`} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity relative group">
-                      {social}
-                      <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
-                    </a>
-                  );
-                })}
+                {socialLinks.map(({ name, href }) => (
+                  <a key={name} href={href} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity relative group">
+                    {name}
+                    <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
+                  </a>
+                ))}
               </motion.div>
 
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.7 }} className="mt-12 text-xs text-white opacity-40 tracking-wider">

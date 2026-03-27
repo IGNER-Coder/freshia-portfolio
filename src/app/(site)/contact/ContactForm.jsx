@@ -17,18 +17,10 @@ export default function ContactForm() {
   // Initialize EmailJS
   useEffect(() => {
     const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-    console.log('🔧 EmailJS Debug:', {
-      publicKey: publicKey ? '[SET]' : '[NOT SET]',
-      serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
-      templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
-      emailjsLoaded: typeof emailjs !== 'undefined'
-    });
-
     if (publicKey) {
       emailjs.init(publicKey);
-      console.log('✅ EmailJS initialized with public key');
     } else {
-      console.error('❌ EmailJS public key not found in environment variables');
+      console.error('EmailJS public key is not configured.');
     }
   }, []);
 
@@ -52,28 +44,18 @@ export default function ContactForm() {
       return;
     }
 
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+
+    if (!serviceId || !templateId) {
+      console.error('EmailJS service or template ID is not configured.');
+      setSubmitStatus('error');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      // Check if EmailJS is initialized
-      if (!emailjs) {
-        throw new Error('EmailJS not loaded');
-      }
-
-      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_3buzk0g';
-      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_xcq528i';
-
-      console.log('📤 Sending email with:', {
-        serviceId,
-        templateId,
-        formData: {
-          from_name: formData.name,
-          from_email: formData.email,
-          inquiry_type: formData.inquiry,
-          message: formData.message.substring(0, 50) + '...'
-        }
-      });
-
-      // Send email via EmailJS
-      const result = await emailjs.send(
+      await emailjs.send(
         serviceId,
         templateId,
         {
@@ -82,7 +64,6 @@ export default function ContactForm() {
           inquiry_type: formData.inquiry,
           message: formData.message,
           to_email: 'freshianjeri123@gmail.com',
-          // Format inquiry type for readability
           inquiry_label: formData.inquiry === 'commission' ? 'Original Commission' :
                         formData.inquiry === 'exhibition' ? 'Exhibition Opportunity' :
                         formData.inquiry === 'studio' ? 'Studio Visit' :
@@ -91,11 +72,8 @@ export default function ContactForm() {
         }
       );
 
-      console.log('✅ Email sent successfully:', result.text);
-      console.log('📧 Email result details:', result);
-      
       setSubmitStatus('success');
-      
+
       // Reset form
       setFormData({
         name: '',
@@ -108,33 +86,9 @@ export default function ContactForm() {
       setTimeout(() => {
         setSubmitStatus(null);
       }, 5000);
-      
+
     } catch (error) {
-      console.error('❌ Email send failed:', error);
-      console.error('Error details:', {
-        message: error?.message,
-        text: error?.text,
-        status: error?.status,
-        name: error?.name,
-        stack: error?.stack?.substring(0, 200),
-        serviceId: process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_3buzk0g',
-        templateId: process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'template_xcq528i',
-        publicKey: process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ? '[SET]' : '[NOT SET]'
-      });
-
-      // Try to provide more specific error messages
-      if (error?.text?.includes('Invalid service id')) {
-        console.error('🔍 Specific error: Invalid service ID');
-      } else if (error?.text?.includes('Invalid template id')) {
-        console.error('🔍 Specific error: Invalid template ID');
-      } else if (error?.text?.includes('Invalid public key')) {
-        console.error('🔍 Specific error: Invalid public key');
-      } else if (error?.status === 400) {
-        console.error('🔍 Specific error: Bad request - check template variables');
-      } else if (error?.status === 401) {
-        console.error('🔍 Specific error: Unauthorized - check credentials');
-      }
-
+      console.error('Email send failed:', error.message);
       setSubmitStatus('error');
 
       // Auto-hide error message after 5 seconds
@@ -159,7 +113,7 @@ export default function ContactForm() {
             Thank you, <strong>{formData.name || 'friend'}</strong>. The studio has received your inquiry and will respond to <strong>{formData.email}</strong> shortly.
           </p>
           <div className="relative group overflow-hidden">
-            <Link 
+            <Link
               href="/artworks"
               className="group flex flex-col items-center gap-1 text-[10px] md:text-sm font-sans font-bold uppercase tracking-widest text-teal-900 transition-all hover:text-teal-700 relative py-2"
             >
@@ -169,7 +123,7 @@ export default function ContactForm() {
           </div>
         </div>
       )}
-      
+
       {/* Error Message */}
       {submitStatus === 'error' && (
         <div className="mb-8 p-6 bg-red-50 border-2 border-red-200">
@@ -199,9 +153,9 @@ export default function ContactForm() {
             <label htmlFor="name" className="block font-sans text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
               Name
             </label>
-            <input 
-              type="text" 
-              id="name" 
+            <input
+              type="text"
+              id="name"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
@@ -216,9 +170,9 @@ export default function ContactForm() {
             <label htmlFor="email" className="block font-sans text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
               Email Address
             </label>
-            <input 
-              type="email" 
-              id="email" 
+            <input
+              type="email"
+              id="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
@@ -235,8 +189,8 @@ export default function ContactForm() {
           <label htmlFor="inquiry" className="block font-sans text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
             Subject of Inquiry
           </label>
-          <select 
-            id="inquiry" 
+          <select
+            id="inquiry"
             name="inquiry"
             value={formData.inquiry}
             onChange={handleInputChange}
@@ -262,12 +216,12 @@ export default function ContactForm() {
           <label htmlFor="message" className="block font-sans text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
             Message
           </label>
-          <textarea 
-            id="message" 
+          <textarea
+            id="message"
             name="message"
             value={formData.message}
             onChange={handleInputChange}
-            rows="5" 
+            rows="5"
             required
             disabled={isSubmitting}
             className="w-full appearance-none rounded-none bg-transparent border-b border-slate-300 py-2 text-slate-900 font-sans text-base font-light leading-relaxed focus:outline-none focus:border-teal-700 transition-colors resize-none disabled:opacity-50"
@@ -282,17 +236,17 @@ export default function ContactForm() {
 
         {/* Submit Button */}
         <div className="pt-6">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isSubmitting}
             className="group flex items-center gap-4 text-sm font-sans font-bold uppercase tracking-widest text-slate-900 transition-all hover:text-teal-700 disabled:opacity-50 disabled:cursor-not-allowed relative px-4 py-2 -ml-4"
           >
             {/* Background that appears on hover */}
             <span className="absolute inset-0 bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            
+
             {/* Animated line */}
             <span className="relative h-[1px] w-12 bg-slate-900 transition-all duration-300 group-hover:w-24 group-hover:bg-teal-700" />
-            
+
             {/* Button text */}
             <span className="relative flex items-center gap-2">
               {isSubmitting && (
