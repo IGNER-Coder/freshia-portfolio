@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import ContactForm from './ContactForm';
 import { CldImage } from 'next-cloudinary';
+import { socialLinks } from '@/app/lib/socials';
 
 export default function ContactPage() {
   return (
@@ -66,21 +67,18 @@ export default function ContactPage() {
                     Connect
                   </h4>
                   <div className="flex flex-col space-y-3">
-                    {['Instagram', 'LinkedIn', 'Behance'].map((social) => {
-                      const username = social === 'Instagram' ? 'fwnjeri' : 'freshianjeri';
-                      return (
-                        <a 
-                          key={social}
-                          href={`https://${social.toLowerCase()}.com/${username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-base text-slate-700 hover:text-teal-700 transition-colors font-light inline-flex items-center relative group w-fit"
-                        >
-                          {social}
-                          <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-teal-700 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
-                        </a>
-                      );
-                    })}
+                    {socialLinks.map(({ name, href }) => (
+                      <a
+                        key={name}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-base text-slate-700 hover:text-teal-700 transition-colors font-light inline-flex items-center relative group w-fit"
+                      >
+                        {name}
+                        <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-teal-700 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
+                      </a>
+                    ))}
                   </div>
                 </div>
               </div>

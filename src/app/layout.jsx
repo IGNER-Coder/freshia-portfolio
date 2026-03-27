@@ -1,13 +1,13 @@
 import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 });
 
-const playfair = Playfair_Display({ 
+const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-playfair',
   display: 'swap',
@@ -24,7 +24,7 @@ export const metadata = {
   authors: [{ name: 'Freshia Njeri' }],
   creator: 'Freshia Njeri',
   publisher: 'Freshia Njeri',
-  
+
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -41,7 +41,7 @@ export const metadata = {
       }
     ],
   },
-  
+
   twitter: {
     card: 'summary_large_image',
     title: 'Freshia Njeri | Visual Artist, Nairobi',
@@ -49,7 +49,7 @@ export const metadata = {
     images: ['/og-image.jpg'],
     creator: '@freshianjeri',
   },
-  
+
   robots: {
     index: true,
     follow: true,
@@ -61,10 +61,8 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  
-  verification: {
-    google: 'your-google-verification-code',
-  },
+  // verification.google removed — add the real code from Google Search Console when ready:
+  // verification: { google: 'your-actual-code-here' },
 };
 
 export default function RootLayout({ children }) {
