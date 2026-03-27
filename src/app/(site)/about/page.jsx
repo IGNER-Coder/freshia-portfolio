@@ -13,26 +13,25 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-teal-700 selection:text-white">
-      {/* MASTHEAD */}
       <AboutMasthead />
 
-      <main className="max-w-7xl mx-auto px-6 py-20 md:px-16 lg:px-24">
-        {/* HIGHLIGHT BANNER - Documenta */}
+      <main className="max-w-7xl mx-auto px-6 py-16 md:px-16 lg:px-24 pb-24">
+        {/* Documenta 15 achievement banner */}
         <AchievementBanner />
 
-        {/* NARRATIVE SECTION */}
+        {/* Portrait + biography */}
         <ArtistBiography />
 
-        {/* Visual Divider */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-32"></div>
+        {/* Visual divider */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-20" />
 
-        {/* COMMUNITY IMPACT SECTION */}
+        {/* Community & education */}
         <CommunityEducation />
 
-        {/* TECHNIQUE SECTION */}
+        {/* Technique */}
         <TechniqueSection />
 
-        {/* RECOGNITION & EXHIBITIONS */}
+        {/* Exhibitions */}
         <ExhibitionsList />
       </main>
     </div>
