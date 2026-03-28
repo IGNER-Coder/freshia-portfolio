@@ -12,7 +12,6 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
-  // Live clock for homepage
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
@@ -25,7 +24,6 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
     return () => clearInterval(interval)
   }, [])
 
-  // Scroll listener for inner pages sticky nav
   useEffect(() => {
     if (variant !== 'inner') return
     const handleScroll = () => setScrolled(window.scrollY > 70)
@@ -42,111 +40,126 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   ]
 
   const textColorClass = theme === 'light' ? 'text-white' : 'text-slate-900'
-  const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-slate-900'
+  const bgColorClass   = theme === 'light' ? 'bg-white'   : 'bg-slate-900'
 
-  // Shared nav link list used in both static + sticky inner nav
-  const NavLinks = ({ className = '' }) => (
-    <nav className={`hidden md:flex items-center gap-12 ${className}`}>
+  /* ── Shared pieces used in both static + sticky inner bar ── */
+  const InnerNavLinks = () => (
+    <nav className="hidden md:flex items-center gap-10">
       {navItems.map((item) => {
         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
         return (
           <Link
             key={item.label}
             href={item.href}
-            className={`text-xs tracking-widest uppercase font-bold transition-all duration-300 ${
+            className={`font-sans text-[11px] tracking-[0.18em] uppercase font-bold transition-all duration-300 relative group pb-0.5 ${
               isActive ? 'text-teal-700' : 'text-slate-400 hover:text-slate-900'
             }`}
           >
             {item.label}
+            {/* teal underline on active; subtle slide-in on hover */}
+            <span className={`absolute bottom-0 left-0 right-0 h-[1.5px] transition-all duration-300 origin-left ${
+              isActive ? 'bg-teal-600 scale-x-100' : 'bg-slate-400 scale-x-0 group-hover:scale-x-100'
+            }`} />
           </Link>
         )
       })}
     </nav>
   )
 
-  const MobileBar = () => (
+  const InnerMobileBar = () => (
     <div className="md:hidden w-full flex items-center justify-between">
-      <span className="font-serif font-bold text-lg text-slate-900">FN</span>
-      <motion.button
+      <Link href="/" className="font-serif font-bold text-xl text-slate-900 tracking-tight select-none">FN</Link>
+      {/* 44px tap target */}
+      <button
         onClick={() => setMenuOpen(true)}
-        className="text-slate-900 hover:text-teal-700 transition-colors duration-300 p-2"
         aria-label="Open menu"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        className="flex items-center justify-center w-11 h-11 -mr-2 text-slate-900 hover:text-teal-700 transition-colors duration-300"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-      </motion.button>
+      </button>
     </div>
   )
 
   return (
     <>
-      {/* ── HOMEPAGE VARIANT ────────────────────────────────────── */}
+      {/* ══ HOMEPAGE VARIANT — original centered floating nav ══ */}
       {variant === 'homepage' && (
-        <div className="absolute top-0 left-0 right-0 z-40 flex items-start justify-between px-6 md:px-12 pt-8 md:pt-10 pointer-events-none">
-          <div className="w-full flex justify-between pointer-events-auto items-center">
+        <div className="absolute top-0 left-0 right-0 z-40 pointer-events-none">
+          <div className="flex items-center justify-between px-6 md:px-12 pt-8 md:pt-10 pointer-events-auto">
             {/* Location */}
-            <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity duration-300 font-bold uppercase`}>
+            <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity font-bold uppercase`}>
               • NAIROBI, KE
             </div>
 
-            {/* Desktop nav */}
+            {/* Centered nav */}
             <nav className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
-                <Link key={item.label} href={item.href} className={`${textColorClass} opacity-70 hover:opacity-100 transition-opacity text-sm tracking-widest font-bold uppercase relative group`}>
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`${textColorClass} opacity-70 hover:opacity-100 transition-opacity text-sm tracking-widest font-bold uppercase relative group`}
+                >
                   {item.label}
                   <span className={`absolute -bottom-1 left-0 right-0 h-[1px] ${bgColorClass} scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300`} />
                 </Link>
               ))}
             </nav>
 
-            {/* Mobile hamburger */}
-            <motion.button
+            {/* Mobile hamburger — 44px tap target */}
+            <button
               onClick={() => setMenuOpen(true)}
-              className={`md:hidden ${textColorClass} opacity-70 hover:opacity-100 transition-opacity duration-300`}
               aria-label="Open menu"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className={`md:hidden flex items-center justify-center w-11 h-11 ${textColorClass} opacity-70 hover:opacity-100 transition-opacity duration-300`}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-            </motion.button>
+            </button>
 
-            {/* Time */}
-            <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity duration-300 font-bold uppercase`}>
+            {/* Live clock */}
+            <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity font-bold uppercase`}>
               {currentTime}
             </div>
           </div>
         </div>
       )}
 
-      {/* ── INNER PAGES VARIANT ─────────────────────────────────── */}
+      {/* ══ INNER PAGES VARIANT ══ */}
       {variant === 'inner' && (
         <>
-          {/* Static nav — visible at top, scrolls away with page */}
-          <div className="w-full bg-white border-b border-slate-900/5 py-5 px-6 md:px-16">
-            <div className="max-w-7xl mx-auto flex items-center justify-center relative">
-              <NavLinks />
-              <MobileBar />
+          {/* Static bar — visible at top, scrolls away naturally */}
+          <div className="w-full bg-[#FAF9F6] border-b border-slate-900/8 py-5 px-6 md:px-16">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              {/* Monogram */}
+              <Link href="/" className="font-serif font-bold text-xl text-slate-900 tracking-tight select-none hidden md:block">
+                FN
+              </Link>
+              <InnerNavLinks />
+              <InnerMobileBar />
+              {/* Right side spacer on desktop to balance monogram */}
+              <div className="hidden md:block w-8" />
             </div>
           </div>
 
-          {/* Sticky nav — slides in once static nav scrolls out of view */}
+          {/* Sticky bar — slides in once static bar scrolls out of view */}
           <AnimatePresence>
             {scrolled && (
               <motion.div
-                initial={{ y: -70, opacity: 0 }}
+                initial={{ y: -64, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -70, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className="fixed top-0 left-0 right-0 z-[70] bg-white/95 backdrop-blur-md border-b border-slate-900/5 shadow-sm py-4 px-6 md:px-16"
+                exit={{ y: -64, opacity: 0 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+                className="fixed top-0 left-0 right-0 z-[70] bg-[#FAF9F6]/95 backdrop-blur-md border-b border-slate-900/8 shadow-[0_1px_8px_rgba(0,0,0,0.06)] py-4 px-6 md:px-16"
               >
-                <div className="max-w-7xl mx-auto flex items-center justify-center relative">
-                  <NavLinks />
-                  <MobileBar />
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                  <Link href="/" className="font-serif font-bold text-xl text-slate-900 tracking-tight select-none hidden md:block">
+                    FN
+                  </Link>
+                  <InnerNavLinks />
+                  <InnerMobileBar />
+                  <div className="hidden md:block w-8" />
                 </div>
               </motion.div>
             )}
@@ -154,7 +167,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
         </>
       )}
 
-      {/* ── FULLSCREEN MENU OVERLAY ─────────────────────────────── */}
+      {/* ══ FULLSCREEN MENU OVERLAY ══ */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -162,20 +175,18 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[80] pointer-events-auto"
+            className="fixed inset-0 z-[80]"
             style={{ backgroundColor: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(8px)' }}
           >
-            <motion.button
+            <button
               onClick={() => setMenuOpen(false)}
-              className="absolute top-8 right-6 md:top-10 md:right-12 text-white opacity-70 hover:opacity-100 transition-opacity"
               aria-label="Close menu"
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
+              className="absolute top-8 right-6 md:top-10 md:right-12 flex items-center justify-center w-11 h-11 text-white opacity-70 hover:opacity-100 transition-opacity"
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </motion.button>
+            </button>
 
             <div className="h-full flex flex-col items-center justify-center">
               <nav className="space-y-8 md:space-y-10">
@@ -184,7 +195,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
                     key={item.label}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
                   >
                     <Link
                       href={item.href}
@@ -203,18 +214,24 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               <motion.div
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="w-32 h-[1px] bg-white opacity-20 my-12"
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="w-24 h-[1px] bg-white opacity-20 my-12"
               />
 
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="flex items-center space-x-8 text-sm text-white opacity-60"
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="flex items-center gap-8 text-sm text-white opacity-50"
               >
                 {socialLinks.map(({ name, href }) => (
-                  <a key={name} href={href} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity relative group">
+                  <a
+                    key={name}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:opacity-100 transition-opacity relative group"
+                  >
                     {name}
                     <span className="absolute -bottom-1 left-0 right-0 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
                   </a>
@@ -224,8 +241,8 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-                className="mt-12 text-xs text-white opacity-40 tracking-wider"
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="mt-10 text-xs text-white opacity-30 tracking-wider"
               >
                 Wajukuu Arts Collective
               </motion.p>
