@@ -12,6 +12,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
+  // Live clock for homepage
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
@@ -19,21 +20,18 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
       const minutes = now.getMinutes().toString().padStart(2, '0')
       setCurrentTime(`${hours}:${minutes} EAT`)
     }
-
     updateTime()
     const interval = setInterval(updateTime, 60000)
     return () => clearInterval(interval)
   }, [])
 
+  // Scroll listener for inner pages sticky nav
   useEffect(() => {
-    if (variant === 'inner') {
-      const handleScroll = () => {
-        setScrolled(window.scrollY > 80)
-      }
-      window.addEventListener('scroll', handleScroll)
-      handleScroll()
-      return () => window.removeEventListener('scroll', handleScroll)
-    }
+    if (variant !== 'inner') return
+    const handleScroll = () => setScrolled(window.scrollY > 70)
+    window.addEventListener('scroll', handleScroll)
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [variant])
 
   const navItems = [
@@ -46,9 +44,46 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const textColorClass = theme === 'light' ? 'text-white' : 'text-slate-900'
   const bgColorClass = theme === 'light' ? 'bg-white' : 'bg-slate-900'
 
+  // Shared nav link list used in both static + sticky inner nav
+  const NavLinks = ({ className = '' }) => (
+    <nav className={`hidden md:flex items-center gap-12 ${className}`}>
+      {navItems.map((item) => {
+        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+        return (
+          <Link
+            key={item.label}
+            href={item.href}
+            className={`text-xs tracking-widest uppercase font-bold transition-all duration-300 ${
+              isActive ? 'text-teal-700' : 'text-slate-400 hover:text-slate-900'
+            }`}
+          >
+            {item.label}
+          </Link>
+        )
+      })}
+    </nav>
+  )
+
+  const MobileBar = () => (
+    <div className="md:hidden w-full flex items-center justify-between">
+      <span className="font-serif font-bold text-lg text-slate-900">FN</span>
+      <motion.button
+        onClick={() => setMenuOpen(true)}
+        className="text-slate-900 hover:text-teal-700 transition-colors duration-300 p-2"
+        aria-label="Open menu"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </motion.button>
+    </div>
+  )
+
   return (
     <>
-      {/* HOMEPAGE VARIANT */}
+      {/* ── HOMEPAGE VARIANT ────────────────────────────────────── */}
       {variant === 'homepage' && (
         <div className="absolute top-0 left-0 right-0 z-40 flex items-start justify-between px-6 md:px-12 pt-8 md:pt-10 pointer-events-none">
           <div className="w-full flex justify-between pointer-events-auto items-center">
@@ -57,7 +92,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               • NAIROBI, KE
             </div>
 
-            {/* Desktop Navigation */}
+            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-8">
               {navItems.map((item) => (
                 <Link key={item.label} href={item.href} className={`${textColorClass} opacity-70 hover:opacity-100 transition-opacity text-sm tracking-widest font-bold uppercase relative group`}>
@@ -67,16 +102,16 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               ))}
             </nav>
 
-            {/* Mobile Hamburger Icon */}
+            {/* Mobile hamburger */}
             <motion.button
               onClick={() => setMenuOpen(true)}
-              className={`md:hidden ${textColorClass} opacity-70 hover:opacity-100 transition-opacity duration-300 group flex items-center gap-2`}
+              className={`md:hidden ${textColorClass} opacity-70 hover:opacity-100 transition-opacity duration-300`}
               aria-label="Open menu"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <motion.path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </motion.button>
 
@@ -88,61 +123,38 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
         </div>
       )}
 
-      {/* INNER PAGES VARIANT (Sticky on Scroll) */}
+      {/* ── INNER PAGES VARIANT ─────────────────────────────────── */}
       {variant === 'inner' && (
-        <AnimatePresence>
-          {scrolled && (
-            <motion.div
-              initial={{ y: -100 }}
-              animate={{ y: 0 }}
-              exit={{ y: -100 }}
-              transition={{ duration: 0.4, ease: "circOut" }}
-              className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-900/5 z-[70] shadow-sm py-4 px-6 md:px-16"
-            >
-              <div className="max-w-7xl mx-auto flex items-center justify-between md:justify-center relative">
+        <>
+          {/* Static nav — visible at top, scrolls away with page */}
+          <div className="w-full bg-white border-b border-slate-900/5 py-5 px-6 md:px-16">
+            <div className="max-w-7xl mx-auto flex items-center justify-center relative">
+              <NavLinks />
+              <MobileBar />
+            </div>
+          </div>
 
-                {/* Desktop Menu */}
-                <nav className="hidden md:flex items-center gap-12">
-                  {navItems.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        className={`text-xs md:text-sm tracking-widest uppercase font-bold transition-all duration-300 ${
-                          isActive
-                            ? 'text-teal-700'
-                            : 'text-slate-500 hover:text-teal-800 hover:-translate-y-0.5'
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </nav>
-
-                {/* Mobile */}
-                <div className="md:hidden w-full flex items-center justify-between">
-                  <span className="font-serif font-bold text-lg text-slate-900">FN</span>
-                  <motion.button
-                    onClick={() => setMenuOpen(true)}
-                    className="text-slate-900 hover:text-teal-700 transition-colors duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <motion.path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </motion.button>
+          {/* Sticky nav — slides in once static nav scrolls out of view */}
+          <AnimatePresence>
+            {scrolled && (
+              <motion.div
+                initial={{ y: -70, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -70, opacity: 0 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="fixed top-0 left-0 right-0 z-[70] bg-white/95 backdrop-blur-md border-b border-slate-900/5 shadow-sm py-4 px-6 md:px-16"
+              >
+                <div className="max-w-7xl mx-auto flex items-center justify-center relative">
+                  <NavLinks />
+                  <MobileBar />
                 </div>
-
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
       )}
 
-      {/* Full-Screen Menu Overlay */}
+      {/* ── FULLSCREEN MENU OVERLAY ─────────────────────────────── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -150,11 +162,8 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 pointer-events-auto"
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.95)',
-              backdropFilter: 'blur(8px)'
-            }}
+            className="fixed inset-0 z-[80] pointer-events-auto"
+            style={{ backgroundColor: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(8px)' }}
           >
             <motion.button
               onClick={() => setMenuOpen(false)}
@@ -177,7 +186,11 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
                   >
-                    <Link href={item.href} className="block text-4xl md:text-6xl font-serif font-light text-white opacity-90 text-center relative group" onClick={() => setMenuOpen(false)}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="block text-4xl md:text-6xl font-serif font-light text-white opacity-90 text-center relative group"
+                    >
                       <span className="relative">
                         {item.label}
                         <span className="absolute -bottom-2 left-0 right-0 h-[2px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
@@ -187,9 +200,19 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
                 ))}
               </nav>
 
-              <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.6, delay: 0.5 }} className="w-32 h-[1px] bg-white opacity-20 my-12" />
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="w-32 h-[1px] bg-white opacity-20 my-12"
+              />
 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex items-center space-x-8 text-sm text-white opacity-60">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="flex items-center space-x-8 text-sm text-white opacity-60"
+              >
                 {socialLinks.map(({ name, href }) => (
                   <a key={name} href={href} target="_blank" rel="noopener noreferrer" className="hover:opacity-100 transition-opacity relative group">
                     {name}
@@ -198,7 +221,12 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
                 ))}
               </motion.div>
 
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.7 }} className="mt-12 text-xs text-white opacity-40 tracking-wider">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+                className="mt-12 text-xs text-white opacity-40 tracking-wider"
+              >
                 Wajukuu Arts Collective
               </motion.p>
             </div>
