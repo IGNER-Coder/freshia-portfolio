@@ -1,64 +1,51 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import GlobalNav from './components/GlobalNav'
 
 export default function HomePage() {
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   return (
     <div className="relative w-full h-screen overflow-hidden">
 
-      {/* Sticky nav — appears on scroll */}
-      <AnimatePresence>
-        {scrolled && (
-          <motion.div
-            initial={{ y: -80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -80, opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'circOut' }}
-            className="fixed top-0 left-0 right-0 z-50 bg-black/70 backdrop-blur-md border-b border-white/10"
-          >
-            <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-              <span className="font-serif text-white text-lg font-bold tracking-tight">FN</span>
-              <nav className="hidden md:flex items-center gap-10">
-                {[
-                  { label: 'About', href: '/about' },
-                  { label: 'Artworks', href: '/artworks' },
-                  { label: 'Contact', href: '/contact' },
-                ].map(({ label, href }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    className="text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors duration-300"
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </nav>
-              {/* Mobile: just show the gallery CTA */}
-              <Link
-                href="/artworks"
-                className="md:hidden text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
-              >
-                Gallery →
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* STICKY NAV — always visible, fixed at top, frosted glass over the hero */}
+      <motion.div
+        initial={{ y: -60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/10"
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
+          {/* Logo mark */}
+          <span className="font-serif text-white text-lg font-bold tracking-tight select-none">FN</span>
 
-      {/* Always-visible absolute nav at top */}
-      <GlobalNav theme="light" variant="homepage" />
+          {/* Desktop nav links */}
+          <nav className="hidden md:flex items-center gap-10">
+            {[
+              { label: 'About', href: '/about' },
+              { label: 'Artworks', href: '/artworks' },
+              { label: 'Contact', href: '/contact' },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors duration-300 relative group"
+              >
+                {label}
+                <span className="absolute -bottom-0.5 left-0 right-0 h-px bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
+              </Link>
+            ))}
+          </nav>
+
+          {/* Mobile: hamburger placeholder — links to gallery */}
+          <Link
+            href="/artworks"
+            className="md:hidden text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
+          >
+            Gallery →
+          </Link>
+        </div>
+      </motion.div>
 
       {/* Background image + overlay */}
       <div className="absolute inset-0 z-0">
