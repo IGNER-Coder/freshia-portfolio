@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Suspense } from 'react';
 import ContactForm from './ContactForm';
 import StudioPolaroid from '../../components/StudioPolaroid';
 import { socialLinks } from '@/app/lib/socials';
@@ -13,7 +13,7 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-teal-700 selection:text-white">
 
       {/* MASTHEAD */}
-      <header className="px-6 pt-20 pb-12 md:px-16 lg:px-24">
+      <header className="px-6 pt-8 pb-12 md:px-16 lg:px-24">
         <div className="max-w-7xl mx-auto">
           <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-teal-700 mb-6">
             Vol. 02 — Inquiries
@@ -31,10 +31,8 @@ export default function ContactPage() {
           {/* LEFT — Polaroid + info */}
           <div className="lg:col-span-5 flex flex-col gap-10">
 
-            {/* Polaroid — centrepiece at top */}
             <StudioPolaroid />
 
-            {/* Contact details */}
             <div>
               <h2 className="font-serif text-2xl md:text-3xl mb-8 leading-tight text-slate-800">
                 For commissions, exhibitions, or studio visits — reach out.
@@ -42,9 +40,7 @@ export default function ContactPage() {
 
               <div className="space-y-7 font-sans">
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
-                    Studio Location
-                  </h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Studio Location</h4>
                   <p className="text-sm text-slate-700 font-light leading-relaxed">
                     Wajukuu Arts Collective<br />
                     Lunga Lunga, Mukuru<br />
@@ -53,9 +49,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
-                    Direct Email
-                  </h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Direct Email</h4>
                   <a
                     href="mailto:freshianjeri123@gmail.com"
                     className="text-sm text-teal-700 hover:text-slate-900 transition-colors font-light"
@@ -65,16 +59,12 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
-                    Response Time
-                  </h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Response Time</h4>
                   <p className="text-sm text-slate-700 font-light">Within 24–48 hours</p>
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
-                    Connect
-                  </h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Connect</h4>
                   <div className="flex flex-col gap-2">
                     {socialLinks.map(({ name, href }) => (
                       <a
@@ -94,9 +84,11 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* RIGHT — Form */}
+          {/* RIGHT — Form wrapped in Suspense for useSearchParams */}
           <div className="lg:col-span-7">
-            <ContactForm />
+            <Suspense fallback={<div className="animate-pulse h-96 bg-slate-100 rounded" />}>
+              <ContactForm />
+            </Suspense>
           </div>
 
         </div>
