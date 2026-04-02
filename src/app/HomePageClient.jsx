@@ -3,51 +3,16 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import GlobalNav from '@/app/components/GlobalNav'
 
 export default function HomePage() {
   return (
     <div className="relative w-full h-screen overflow-hidden">
 
-      {/* STICKY NAV — always visible, fixed at top, frosted glass over the hero */}
-      <motion.div
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/10"
-      >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-          {/* Logo mark */}
-          <span className="font-serif text-white text-lg font-bold tracking-tight select-none">FN</span>
+      {/* ── Transparent floating nav — no background, floats over hero image ── */}
+      <GlobalNav theme="light" variant="homepage" />
 
-          {/* Desktop nav links */}
-          <nav className="hidden md:flex items-center gap-10">
-            {[
-              { label: 'About', href: '/about' },
-              { label: 'Artworks', href: '/artworks' },
-              { label: 'Contact', href: '/contact' },
-            ].map(({ label, href }) => (
-              <Link
-                key={label}
-                href={href}
-                className="text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors duration-300 relative group"
-              >
-                {label}
-                <span className="absolute -bottom-0.5 left-0 right-0 h-px bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
-              </Link>
-            ))}
-          </nav>
-
-          {/* Mobile: hamburger placeholder — links to gallery */}
-          <Link
-            href="/artworks"
-            className="md:hidden text-white/70 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors"
-          >
-            Gallery →
-          </Link>
-        </div>
-      </motion.div>
-
-      {/* Background image + overlay */}
+      {/* ── Background image (no overlay tint — pure image) ── */}
       <div className="absolute inset-0 z-0">
         <Image
           src="https://res.cloudinary.com/doevklqj6/image/upload/w_1920,h_1280,c_fill,g_center,q_auto,f_auto/v1771654953/homepage-background_jabt7w.jpg"
@@ -55,12 +20,13 @@ export default function HomePage() {
           fill
           priority
           className="object-cover object-center"
-          quality={80}
+          quality={85}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/30" />
+        {/* Subtle gradient only at very top + bottom to keep text legible */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/35" />
       </div>
 
-      {/* Content layer */}
+      {/* ── Content layer ── */}
       <div className="relative z-20 h-full flex flex-col pointer-events-none">
 
         {/* Center hero text */}
@@ -71,7 +37,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-center"
           >
-            {/* Name — tighter on mobile */}
+            {/* Name */}
             <h1 className="font-serif mb-2 pointer-events-auto">
               <span className="block text-5xl sm:text-7xl md:text-9xl font-bold text-white tracking-tight">
                 FRESHIA
@@ -119,7 +85,7 @@ export default function HomePage() {
           className="pb-10 md:pb-16 px-6 md:px-12 pointer-events-auto"
         >
           <div className="flex items-center justify-between md:justify-end gap-6">
-            {/* Secondary: About — visible on mobile to give a second path */}
+            {/* Secondary: About — visible on mobile */}
             <Link
               href="/about"
               className="text-white/50 hover:text-white/80 text-xs tracking-widest uppercase font-light transition-colors duration-300 md:hidden"
@@ -149,12 +115,7 @@ export default function HomePage() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </motion.div>
             </Link>

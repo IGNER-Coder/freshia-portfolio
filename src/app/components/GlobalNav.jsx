@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -10,8 +10,11 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
   const [scrolled, setScrolled] = useState(false)
+  const [navOpaque, setNavOpaque] = useState(false)
   const pathname = usePathname()
+  const dropdownRef = useRef(null)
 
+  /* ── Live clock (Nairobi / EAT) ── */
   useEffect(() => {
     const updateTime = () => {
       const now = new Date()
@@ -24,25 +27,59 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
     return () => clearInterval(interval)
   }, [])
 
+  /* ── Scroll: inner-page sticky + homepage nav opacity ── */
   useEffect(() => {
-    if (variant !== 'inner') return
-    const handleScroll = () => setScrolled(window.scrollY > 70)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => {
+      const y = window.scrollY
+      if (variant === 'inner') setScrolled(y > 70)
+      if (variant === 'homepage') setNavOpaque(y > 40)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [variant])
 
+  /* ── Body scroll lock when mobile menu is open ── */
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
+  /* ── Close dropdown on outside click ── */
+  useEffect(() => {
+    if (!menuOpen) return
+    const handler = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    document.addEventListener('touchstart', handler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('touchstart', handler)
+    }
+  }, [menuOpen])
+
+  /* ── Close dropdown on route change ── */
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
   const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'About', href: '/about' },
+    { label: 'Home',     href: '/' },
+    { label: 'About',    href: '/about' },
     { label: 'Artworks', href: '/artworks' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Contact',  href: '/contact' },
   ]
 
   const textColorClass = theme === 'light' ? 'text-white' : 'text-slate-900'
-  const bgColorClass   = theme === 'light' ? 'bg-white'   : 'bg-slate-900'
 
-  /* ── Shared pieces used in both static + sticky inner bar ── */
+  /* ── Inner page shared nav links ── */
   const InnerNavLinks = () => (
     <nav className="hidden md:flex items-center gap-10">
       {navItems.map((item) => {
@@ -56,7 +93,6 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
             }`}
           >
             {item.label}
-            {/* teal underline on active; subtle slide-in on hover */}
             <span className={`absolute bottom-0 left-0 right-0 h-[1.5px] transition-all duration-300 origin-left ${
               isActive ? 'bg-teal-600 scale-x-100' : 'bg-slate-400 scale-x-0 group-hover:scale-x-100'
             }`} />
@@ -69,10 +105,11 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const InnerMobileBar = () => (
     <div className="md:hidden w-full flex items-center justify-between">
       <Link href="/" className="font-serif font-bold text-xl text-slate-900 tracking-tight select-none">FN</Link>
-      {/* 44px tap target */}
       <button
         onClick={() => setMenuOpen(true)}
         aria-label="Open menu"
+        aria-expanded={menuOpen}
+        aria-controls="mobile-menu"
         className="flex items-center justify-center w-11 h-11 -mr-2 text-slate-900 hover:text-teal-700 transition-colors duration-300"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,43 +121,146 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
 
   return (
     <>
-      {/* ══ HOMEPAGE VARIANT — original centered floating nav ══ */}
+      {/* ══ HOMEPAGE VARIANT ══ */}
       {variant === 'homepage' && (
-        <div className="absolute top-0 left-0 right-0 z-40 pointer-events-none">
-          <div className="flex items-center justify-between px-6 md:px-12 pt-8 md:pt-10 pointer-events-auto">
-            {/* Location */}
-            <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity font-bold uppercase`}>
-              • NAIROBI, KE
-            </div>
+        <div
+          className={`absolute top-0 left-0 right-0 z-40 transition-all duration-500 ${
+            navOpaque ? 'bg-black/40 backdrop-blur-md' : 'bg-transparent'
+          }`}
+        >
+          <div className="flex items-center justify-between px-6 md:px-12 py-5 md:py-7">
 
-            {/* Centered nav */}
-            <nav className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`${textColorClass} opacity-70 hover:opacity-100 transition-opacity text-sm tracking-widest font-bold uppercase relative group`}
-                >
-                  {item.label}
-                  <span className={`absolute -bottom-1 left-0 right-0 h-[1px] ${bgColorClass} scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300`} />
-                </Link>
-              ))}
+            {/* Left — FN monogram */}
+            <Link
+              href="/"
+              className={`font-serif font-bold text-xl ${textColorClass} tracking-tight select-none transition-opacity duration-300 opacity-80 hover:opacity-100`}
+            >
+              FN
+            </Link>
+
+            {/* Center — desktop nav links */}
+            <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`${textColorClass} text-[11px] tracking-[0.2em] font-bold uppercase relative group pb-0.5 transition-all duration-300 ${
+                      isActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    {item.label}
+                    {/* Active dot */}
+                    {isActive && (
+                      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white" />
+                    )}
+                    {/* Hover underline */}
+                    {!isActive && (
+                      <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-center duration-300" />
+                    )}
+                  </Link>
+                )
+              })}
             </nav>
 
-            {/* Mobile hamburger — 44px tap target */}
-            <button
-              onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
-              className={`md:hidden flex items-center justify-center w-11 h-11 ${textColorClass} opacity-70 hover:opacity-100 transition-opacity duration-300`}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+            {/* Right side: clock + mobile hamburger */}
+            <div className="flex items-center gap-4">
+              {/* Live clock — always on the right */}
+              <span className={`hidden sm:block ${textColorClass} text-[11px] tracking-widest font-bold uppercase opacity-60 hover:opacity-100 transition-opacity duration-300 tabular-nums`}>
+                {currentTime}
+              </span>
 
-            {/* Live clock */}
-            <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity font-bold uppercase`}>
-              {currentTime}
+              {/* Mobile hamburger — 44px tap target */}
+              <div ref={dropdownRef} className="relative md:hidden">
+                <button
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                  aria-expanded={menuOpen}
+                  aria-controls="mobile-dropdown"
+                  className={`flex items-center justify-center w-11 h-11 ${textColorClass} opacity-70 hover:opacity-100 transition-all duration-300`}
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    {menuOpen ? (
+                      <motion.svg
+                        key="close"
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: 90, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                      </motion.svg>
+                    ) : (
+                      <motion.svg
+                        key="open"
+                        initial={{ rotate: 90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: -90, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                      </motion.svg>
+                    )}
+                  </AnimatePresence>
+                </button>
+
+                {/* Slide-down dropdown */}
+                <AnimatePresence>
+                  {menuOpen && (
+                    <motion.div
+                      id="mobile-dropdown"
+                      role="menu"
+                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                      transition={{ duration: 0.22, ease: 'easeOut' }}
+                      className="absolute right-0 top-full mt-2 w-48 rounded-xl overflow-hidden shadow-2xl border border-white/10"
+                      style={{ background: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(20px)' }}
+                    >
+                      {navItems.map((item, index) => {
+                        const isActive = pathname === item.href
+                        return (
+                          <motion.div
+                            key={item.label}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.18, delay: index * 0.05 }}
+                          >
+                            <Link
+                              href={item.href}
+                              role="menuitem"
+                              onClick={() => setMenuOpen(false)}
+                              className={`flex items-center gap-3 px-5 py-3.5 text-sm tracking-widest uppercase font-bold transition-all duration-200 group ${
+                                isActive
+                                  ? 'text-white bg-white/10'
+                                  : 'text-white/60 hover:text-white hover:bg-white/8'
+                              }`}
+                            >
+                              {isActive && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                              )}
+                              <span className={isActive ? '' : 'ml-[18px]'}>{item.label}</span>
+                            </Link>
+                          </motion.div>
+                        )
+                      })}
+                      {/* Clock inside dropdown on very small screens */}
+                      <div className="px-5 py-3 border-t border-white/10 text-[10px] text-white/30 tracking-widest uppercase tabular-nums sm:hidden">
+                        {currentTime}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
@@ -129,21 +269,19 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
       {/* ══ INNER PAGES VARIANT ══ */}
       {variant === 'inner' && (
         <>
-          {/* Static bar — visible at top, scrolls away naturally */}
+          {/* Static bar */}
           <div className="w-full bg-[#FAF9F6] border-b border-slate-900/8 py-5 px-6 md:px-16">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-              {/* Monogram */}
               <Link href="/" className="font-serif font-bold text-xl text-slate-900 tracking-tight select-none hidden md:block">
                 FN
               </Link>
               <InnerNavLinks />
               <InnerMobileBar />
-              {/* Right side spacer on desktop to balance monogram */}
               <div className="hidden md:block w-8" />
             </div>
           </div>
 
-          {/* Sticky bar — slides in once static bar scrolls out of view */}
+          {/* Sticky bar */}
           <AnimatePresence>
             {scrolled && (
               <motion.div
@@ -167,9 +305,9 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
         </>
       )}
 
-      {/* ══ FULLSCREEN MENU OVERLAY ══ */}
+      {/* ══ FULLSCREEN MENU OVERLAY (inner pages mobile) ══ */}
       <AnimatePresence>
-        {menuOpen && (
+        {menuOpen && variant === 'inner' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
