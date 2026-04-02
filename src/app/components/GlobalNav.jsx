@@ -172,12 +172,12 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
               </span>
 
               {/* Mobile hamburger — 44px tap target */}
-              <div ref={dropdownRef} className="relative md:hidden">
+              <div className="relative md:hidden">
                 <button
                   onClick={() => setMenuOpen((prev) => !prev)}
                   aria-label={menuOpen ? 'Close menu' : 'Open menu'}
                   aria-expanded={menuOpen}
-                  aria-controls="mobile-dropdown"
+                  aria-controls="mobile-bottom-sheet"
                   className={`flex items-center justify-center w-11 h-11 ${textColorClass} opacity-70 hover:opacity-100 transition-all duration-300`}
                 >
                   <AnimatePresence mode="wait" initial={false}>
@@ -212,54 +212,6 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
                     )}
                   </AnimatePresence>
                 </button>
-
-                {/* Slide-down dropdown */}
-                <AnimatePresence>
-                  {menuOpen && (
-                    <motion.div
-                      id="mobile-dropdown"
-                      role="menu"
-                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                      transition={{ duration: 0.22, ease: 'easeOut' }}
-                      className="absolute right-0 top-full mt-2 w-48 rounded-xl overflow-hidden shadow-2xl border border-white/10"
-                      style={{ background: 'rgba(0,0,0,0.80)', backdropFilter: 'blur(20px)' }}
-                    >
-                      {navItems.map((item, index) => {
-                        const isActive = pathname === item.href
-                        return (
-                          <motion.div
-                            key={item.label}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.18, delay: index * 0.05 }}
-                          >
-                            <Link
-                              href={item.href}
-                              role="menuitem"
-                              onClick={() => setMenuOpen(false)}
-                              className={`flex items-center gap-3 px-5 py-3.5 text-sm tracking-widest uppercase font-bold transition-all duration-200 group ${
-                                isActive
-                                  ? 'text-white bg-white/10'
-                                  : 'text-white/60 hover:text-white hover:bg-white/8'
-                              }`}
-                            >
-                              {isActive && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                              )}
-                              <span className={isActive ? '' : 'ml-[18px]'}>{item.label}</span>
-                            </Link>
-                          </motion.div>
-                        )
-                      })}
-                      {/* Clock inside dropdown on very small screens */}
-                      <div className="px-5 py-3 border-t border-white/10 text-[10px] text-white/30 tracking-widest uppercase tabular-nums sm:hidden">
-                        {currentTime}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -304,6 +256,107 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
           </AnimatePresence>
         </>
       )}
+
+      {/* ══ BOTTOM SHEET — homepage mobile ══ */}
+      <AnimatePresence>
+        {menuOpen && variant === 'homepage' && (
+          <>
+            {/* Scrim — tap outside to close */}
+            <motion.div
+              key="scrim"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-[60] md:hidden"
+              style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+              onClick={() => setMenuOpen(false)}
+              aria-hidden="true"
+            />
+
+            {/* Sheet */}
+            <motion.div
+              id="mobile-bottom-sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
+              key="sheet"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+              className="fixed bottom-0 left-0 right-0 z-[70] md:hidden rounded-t-3xl overflow-hidden"
+              style={{ background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(24px)' }}
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 rounded-full bg-white/20" />
+              </div>
+
+              {/* Nav links — large, thumb-friendly */}
+              <nav className="px-6 pt-4 pb-2">
+                {navItems.map((item, index) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.22, delay: index * 0.06 }}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className={`flex items-center justify-between w-full py-4 border-b transition-all duration-200 group ${
+                          isActive
+                            ? 'border-white/10'
+                            : 'border-white/6 active:bg-white/5'
+                        }`}
+                      >
+                        <span className={`font-serif text-2xl tracking-tight transition-colors duration-200 ${
+                          isActive ? 'text-white' : 'text-white/50 group-active:text-white'
+                        }`}>
+                          {item.label}
+                        </span>
+                        <span className={`flex items-center gap-2 transition-all duration-200 ${
+                          isActive ? 'opacity-100' : 'opacity-0 group-active:opacity-60'
+                        }`}>
+                          {isActive && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                          )}
+                          <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+              </nav>
+
+              {/* Footer row — time + close pill */}
+              <div className="flex items-center justify-between px-6 py-5">
+                <span className="text-[11px] text-white/30 tracking-widest uppercase tabular-nums">
+                  {currentTime}
+                </span>
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  aria-label="Close menu"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-white/40 text-xs tracking-widest uppercase hover:border-white/25 hover:text-white/70 transition-all duration-200"
+                >
+                  Close
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Safe area spacer for phones with home indicator */}
+              <div className="h-safe-bottom pb-5" />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* ══ FULLSCREEN MENU OVERLAY (inner pages mobile) ══ */}
       <AnimatePresence>
