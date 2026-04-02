@@ -26,15 +26,13 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   }, [])
 
   useEffect(() => {
-    if (variant === 'inner') {
-      const handleScroll = () => {
-        setScrolled(window.scrollY > 80)
-      }
-      window.addEventListener('scroll', handleScroll)
-      handleScroll()
-      return () => window.removeEventListener('scroll', handleScroll)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
     }
-  }, [variant])
+    window.addEventListener('scroll', handleScroll)
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const navItems = [
     { label: 'Home', href: '/' },
@@ -50,7 +48,13 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
     <>
       {/* HOMEPAGE VARIANT */}
       {variant === 'homepage' && (
-        <div className="absolute top-0 left-0 right-0 z-40 flex items-start justify-between px-6 md:px-12 pt-8 md:pt-10 pointer-events-none">
+        <div 
+          className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-in-out ${
+            scrolled 
+              ? 'bg-black/40 backdrop-blur-md py-4' 
+              : 'bg-transparent pt-8 md:pt-10'
+          } flex items-start justify-between px-6 md:px-12 pointer-events-none`}
+        >
           <div className="w-full flex justify-between pointer-events-auto items-center">
             {/* Location */}
             <div className={`${textColorClass} text-xs md:text-sm tracking-wider opacity-70 hover:opacity-100 transition-opacity duration-300 font-bold uppercase`}>
@@ -90,67 +94,67 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
 
       {/* INNER PAGES VARIANT (Sticky on Scroll) */}
       {variant === 'inner' && (
-        <AnimatePresence>
-          {scrolled && (
-            <motion.div
-              initial={{ y: -100 }}
-              animate={{ y: 0 }}
-              exit={{ y: -100 }}
-              transition={{ duration: 0.4, ease: "circOut" }}
-              className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-900/5 z-[70] shadow-sm py-4 px-6 md:px-16"
-            >
-              <div className="max-w-7xl mx-auto flex items-center justify-between md:justify-center relative">
+        <motion.div
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          className={`fixed top-0 left-0 right-0 z-[70] transition-all duration-300 ${
+            scrolled 
+              ? 'bg-white/95 backdrop-blur-md shadow-sm py-4 border-b border-slate-900/5' 
+              : 'bg-transparent py-8'
+          } px-6 md:px-16`}
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-between md:justify-center relative">
+            {/* Logo/FN shown when scrolled or on mobile */}
+            <div className={`md:absolute left-0 transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
+              <Link href="/" className="font-serif font-bold text-lg text-slate-900">FN</Link>
+            </div>
 
-                {/* Desktop Menu */}
-                <nav className="hidden md:flex items-center gap-12">
-                  {navItems.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        className={`text-xs md:text-sm tracking-widest uppercase font-bold transition-all duration-300 ${
-                          isActive
-                            ? 'text-teal-700'
-                            : 'text-slate-500 hover:text-teal-800 hover:-translate-y-0.5'
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </nav>
-
-                {/* Mobile */}
-                <div className="md:hidden w-full flex items-center justify-between">
-                  <span className="font-serif font-bold text-lg text-slate-900">FN</span>
-                  <motion.button
-                    onClick={() => setMenuOpen(true)}
-                    className="text-slate-900 hover:text-teal-700 transition-colors duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+            {/* Desktop Menu */}
+            <nav className="hidden md:flex items-center gap-12">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`text-xs md:text-sm tracking-widest uppercase font-bold transition-all duration-300 ${
+                      isActive
+                        ? 'text-teal-700'
+                        : 'text-slate-500 hover:text-teal-800 hover:-translate-y-0.5'
+                    }`}
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <motion.path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </motion.button>
-                </div>
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
 
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {/* Mobile Hamburger */}
+            <div className="md:hidden">
+              <motion.button
+                onClick={() => setMenuOpen(true)}
+                className="text-slate-900 hover:text-teal-700 transition-colors duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <motion.path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
       )}
 
       {/* Full-Screen Menu Overlay */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 pointer-events-auto"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed inset-0 z-50 pointer-events-auto flex flex-col justify-end"
             style={{
               backgroundColor: 'rgba(0, 0, 0, 0.95)',
               backdropFilter: 'blur(8px)'
