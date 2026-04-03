@@ -4,6 +4,5 @@
  */
 export const socialLinks = [
   { name: 'Instagram', href: 'https://www.instagram.com/fwnjeri/' },
-  { name: 'LinkedIn',  href: 'https://linkedin.com/in/freshianjeri' },
-  { name: 'Behance',   href: 'https://behance.net/freshianjeri' },
+  { name: 'Facebook',  href: 'https://www.facebook.com/freshianjeri' },
 ];

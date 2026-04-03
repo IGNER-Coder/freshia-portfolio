@@ -4,247 +4,222 @@ import { urlFor } from '@/sanity/lib/image';
 import { notFound } from 'next/navigation';
 import InquiryModal from '../../../components/artworks/InquiryModal';
 
-// Get single artwork by slug
+/* ── Sanity queries ─────────────────────────────────── */
 async function getArtwork(slug) {
-  const query = `*[_type == "artwork" && slug.current == $slug][0] {
-    _id,
-    title,
-    "slug": slug.current,
-    year,
-    medium,
-    dimensions,
-    dimensionsObject,
-    mainImage,
-    gallery[],
-    description,
-    longDescription,
-    status,
-    price,
-    tags,
-    framing
-  }`;
-  
-  return await client.fetch(query, { slug });
+  return client.fetch(
+    `*[_type == "artwork" && slug.current == $slug][0] {
+      _id, title, "slug": slug.current,
+      year, medium, dimensions, dimensionsObject,
+      mainImage, gallery[], description, longDescription,
+      status, price, tags, framing
+    }`,
+    { slug }
+  );
 }
 
-// Get related artworks
-async function getRelatedArtworks(currentId, tags) {
-  const query = `*[_type == "artwork" && _id != $currentId && count((tags[])[@ in $tags]) > 0][0...3] {
-    _id,
-    title,
-    "slug": slug.current,
-    mainImage,
-    year
-  }`;
-  
-  return await client.fetch(query, { currentId, tags: tags || [] });
+async function getRelatedArtworks(currentId, year) {
+  return client.fetch(
+    `*[_type == "artwork" && _id != $currentId && year == $year][0...3] {
+      _id, title, "slug": slug.current, mainImage, year, status
+    }`,
+    { currentId, year }
+  );
 }
 
+/* ── Status label ───────────────────────────────────── */
+const STATUS_MAP = {
+  available: { dot: 'bg-emerald-500', label: 'Available',          color: 'text-teal-700' },
+  sold:      { dot: 'bg-rose-400',    label: 'Sold',               color: 'text-slate-400' },
+  private:   { dot: 'bg-sky-400',     label: 'Private Collection', color: 'text-slate-400' },
+  nfs:       { dot: 'bg-slate-300',   label: 'Not for Sale',       color: 'text-slate-400' },
+};
+
+/* ── Page ───────────────────────────────────────────── */
 export default async function ArtworkDetailPage({ params }) {
   const { slug } = await params;
-  const artwork = await getArtwork(slug);
-  
-  if (!artwork) {
-    notFound();
-  }
-  
-  const relatedWorks = await getRelatedArtworks(artwork._id, artwork.tags);
+  const artwork  = await getArtwork(slug);
+  if (!artwork) notFound();
+
+  const related = await getRelatedArtworks(artwork._id, artwork.year);
+  const status  = STATUS_MAP[artwork.status] ?? STATUS_MAP.nfs;
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-teal-700 selection:text-white pb-32">
-      
-      {/* BREADCRUMB */}
-      <div className="px-6 pt-8 pb-4 md:px-16 lg:px-24 border-b border-slate-900/10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4 font-sans text-xs font-bold uppercase tracking-widest text-slate-400">
-            <Link href="/artworks" className="hover:text-teal-700 transition-colors">
-              Gallery
-            </Link>
-            <span>/</span>
-            <span className="text-slate-900">{artwork.title}</span>
-          </div>
+    <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-teal-700 selection:text-white">
+
+      {/* ── Breadcrumb ───────────────────────────────── */}
+      <div className="px-5 sm:px-8 md:px-16 lg:px-24 py-4 border-b border-slate-900/8">
+        <div className="max-w-7xl mx-auto flex items-center gap-3 font-sans text-[11px] font-bold uppercase tracking-widest text-slate-400">
+          <Link href="/artworks" className="hover:text-teal-700 transition-colors duration-200">
+            Gallery
+          </Link>
+          <span className="text-slate-200">/</span>
+          <span className="text-slate-900 truncate max-w-[200px]">{artwork.title}</span>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 pt-12 md:pt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
-          
-          {/* LEFT: Image */}
-          <div className="lg:col-span-7">
-            <div className="sticky top-24">
-              <div className="w-full aspect-[4/5] bg-white p-3 shadow-md">
-                {artwork.mainImage ? (
-                  <img
-                    src={urlFor(artwork.mainImage)
-                      .width(1200)
-                      .quality(90)
-                      .auto('format')
-                      .url()}
-                    alt={artwork.title}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400">
-                    No Image Available
-                  </div>
-                )}
-              </div>
+      {/* ── Main content ─────────────────────────────── */}
+      <main className="max-w-7xl mx-auto px-5 sm:px-8 md:px-16 lg:px-24 pt-10 md:pt-16 pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
 
-              {/* Dimensions */}
-              {artwork.dimensionsObject && (
-                <div className="mt-6 px-3 py-3 bg-slate-100/50 border border-slate-200/50">
-                  <p className="font-sans text-xs text-slate-600 mb-1">
-                    <span className="font-bold">Actual Size:</span> {artwork.dimensionsObject.width} x {artwork.dimensionsObject.height} cm
-                  </p>
-                  <p className="font-sans text-xs text-slate-500">
-                    (Approximately {Math.round(artwork.dimensionsObject.width / 2.54)} x {Math.round(artwork.dimensionsObject.height / 2.54)} inches)
-                  </p>
-                </div>
-              )}
-
-              {/* Gallery Images */}
-              {artwork.gallery && artwork.gallery.length > 0 && (
-                <div className="mt-8 grid grid-cols-3 gap-4">
-                  {artwork.gallery.map((image, index) => (
-                    <div key={index} className="aspect-square bg-white p-2 shadow-sm">
-                      <img
-                        src={urlFor(image).width(400).height(400).quality(85).auto('format').url()}
-                        alt={`${artwork.title} - View ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: Details */}
-          <div className="lg:col-span-5 flex flex-col gap-12 pt-4">
-            
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="font-sans text-xs font-bold uppercase tracking-widest text-slate-400">
-                  {artwork.year}
-                </span>
-                <span className="h-1 w-1 rounded-full bg-slate-300" />
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${
-                    artwork.status === 'available' ? 'bg-green-500' : 
-                    artwork.status === 'sold' ? 'bg-red-500' : 
-                    'bg-slate-400'
-                  }`}></div>
-                  <span className={`font-sans text-xs font-bold uppercase tracking-widest ${
-                    artwork.status === 'available' ? 'text-teal-700' : 'text-slate-400'
-                  }`}>
-                    {artwork.status === 'available' ? 'Available' :
-                     artwork.status === 'sold' ? 'Sold' :
-                     artwork.status === 'private' ? 'Private Collection' :
-                     'Not for Sale'}
-                  </span>
-                </div>
-              </div>
-              
-              <h1 className="font-serif text-5xl md:text-6xl font-bold leading-tight mb-6">
-                {artwork.title}
-              </h1>
-              
-              <div className="flex flex-col gap-2 font-sans text-sm font-light uppercase tracking-widest text-slate-500 pb-8 border-b border-slate-900/10">
-                <p>{artwork.medium}</p>
-                <p>{artwork.dimensions}</p>
-                {artwork.framing && <p className="text-xs text-slate-400">{artwork.framing}</p>}
-              </div>
-            </div>
-
-            {artwork.description && (
-              <div className="font-sans text-base text-slate-600 font-light leading-relaxed">
-                <p>{artwork.description}</p>
+          {/* ── Left: image ─────────────────────────── */}
+          <div className="lg:col-span-7 lg:sticky lg:top-24">
+            {artwork.mainImage ? (
+              <img
+                src={urlFor(artwork.mainImage)
+                  .width(1400)
+                  .quality(90)
+                  .auto('format')
+                  .url()}
+                alt={artwork.mainImage?.alt || artwork.title}
+                className="w-full h-auto block shadow-lg"
+              />
+            ) : (
+              <div className="aspect-[4/5] bg-slate-100 flex items-center justify-center text-slate-300 text-sm tracking-wider uppercase">
+                No Image
               </div>
             )}
 
-            {artwork.tags && artwork.tags.length > 0 && (
+            {/* Actual size note */}
+            {artwork.dimensionsObject && (
+              <p className="mt-3 font-sans text-xs text-slate-400 tracking-wider">
+                {artwork.dimensionsObject.width} × {artwork.dimensionsObject.height} cm
+                &nbsp;·&nbsp;
+                {Math.round(artwork.dimensionsObject.width / 2.54)} × {Math.round(artwork.dimensionsObject.height / 2.54)} in
+              </p>
+            )}
+
+            {/* Additional gallery images */}
+            {artwork.gallery?.length > 0 && (
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {artwork.gallery.map((img, i) => (
+                  <img
+                    key={i}
+                    src={urlFor(img).width(400).quality(80).auto('format').url()}
+                    alt={img.caption || `${artwork.title} — detail ${i + 1}`}
+                    className="w-full h-auto block object-cover shadow-sm"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Right: metadata ──────────────────────── */}
+          <div className="lg:col-span-5 flex flex-col gap-10 pt-2">
+
+            {/* Year + status */}
+            <div className="flex items-center gap-4">
+              <span className="font-sans text-xs font-bold uppercase tracking-widest text-slate-400 tabular-nums">
+                {artwork.year}
+              </span>
+              <span className="w-1 h-1 rounded-full bg-slate-200" />
+              <span className={`inline-flex items-center gap-1.5 font-sans text-xs font-bold uppercase tracking-widest ${status.color}`}>
+                <span className={`w-2 h-2 rounded-full ${status.dot}`} />
+                {status.label}
+              </span>
+            </div>
+
+            {/* Title */}
+            <div>
+              <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight mb-6">
+                {artwork.title}
+              </h1>
+
+              {/* Medium + dimensions */}
+              <div className="flex flex-col gap-1.5 pb-8 border-b border-slate-900/8 font-sans text-sm font-light text-slate-500 uppercase tracking-widest">
+                <p>{artwork.medium}</p>
+                {artwork.dimensions && <p>{artwork.dimensions}</p>}
+                {artwork.framing   && <p className="text-xs text-slate-400">{artwork.framing}</p>}
+              </div>
+            </div>
+
+            {/* Description */}
+            {artwork.description && (
+              <p className="font-sans text-base text-slate-600 font-light leading-relaxed">
+                {artwork.description}
+              </p>
+            )}
+
+            {/* Tags */}
+            {artwork.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {artwork.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-sans uppercase tracking-wider">
+                {artwork.tags.map((tag, i) => (
+                  <span key={i} className="px-3 py-1 bg-slate-100 text-slate-500 text-[11px] font-sans uppercase tracking-wider">
                     {tag}
                   </span>
                 ))}
               </div>
             )}
 
-            <div className="border-t border-slate-900/10 pt-8">
-              <h3 className="font-sans text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">
-                Additional Details
-              </h3>
-              <div className="space-y-2 font-sans text-sm text-slate-600">
-                <p>✓ Certificate of authenticity included</p>
-                <p>✓ Signed and dated on reverse</p>
-                <p>✓ Ships carefully packaged and insured</p>
-                {artwork.price && <p>✓ Price: {artwork.price}</p>}
-              </div>
+            {/* Provenance details */}
+            <div className="border-t border-slate-900/8 pt-8">
+              <p className="font-sans text-[10px] font-bold uppercase tracking-widest text-slate-300 mb-4">
+                Provenance
+              </p>
+              <ul className="space-y-2 font-sans text-sm text-slate-500 font-light">
+                <li>Certificate of authenticity included</li>
+                <li>Signed and dated on reverse</li>
+                <li>Ships carefully packaged and insured</li>
+                {artwork.price && <li>Price: {artwork.price}</li>}
+              </ul>
             </div>
 
-            <div className="pt-4">
+            {/* Enquiry CTA */}
+            <div className="pt-2">
               <InquiryModal artwork={artwork} />
             </div>
 
+            {/* Back link */}
+            <Link
+              href="/artworks"
+              className="inline-flex items-center gap-2 font-sans text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors duration-200 group"
+            >
+              <svg className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+              </svg>
+              Back to Gallery
+            </Link>
           </div>
         </div>
 
-        {/* RELATED WORKS */}
-        {relatedWorks && relatedWorks.length > 0 && (
-          <section className="mt-32 border-t-2 border-slate-900/10 pt-20">
-            <div className="flex items-baseline justify-between mb-12">
-              <h2 className="font-serif text-4xl md:text-5xl">You May Also Like</h2>
-              <Link 
-                href="/artworks"
-                className="font-sans text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-teal-700 transition-colors"
-              >
-                View All →
+        {/* ── Related works ────────────────────────────── */}
+        {related?.length > 0 && (
+          <section className="mt-32 border-t border-slate-900/8 pt-16">
+            <div className="flex items-baseline justify-between mb-10">
+              <h2 className="font-serif text-3xl md:text-4xl text-slate-900">
+                Also from {artwork.year}
+              </h2>
+              <Link href="/artworks" className="font-sans text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-teal-700 transition-colors">
+                View all →
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {relatedWorks.map(work => (
-                <Link 
-                  key={work._id} 
-                  href={`/artworks/${work.slug}`}
-                  className="group"
-                >
-                  <div className="aspect-[4/5] bg-white p-2 shadow-sm mb-4 overflow-hidden">
+            <div className="columns-2 md:columns-3 gap-6 md:gap-10">
+              {related.map((work) => (
+                <div key={work._id} className="break-inside-avoid mb-8 group">
+                  <Link href={`/artworks/${work.slug}`} className="block overflow-hidden mb-3">
                     {work.mainImage ? (
                       <img
-                        src={urlFor(work.mainImage).width(600).height(750).quality(85).auto('format').url()}
+                        src={urlFor(work.mainImage).width(600).quality(85).auto('format').url()}
                         alt={work.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.03]"
+                        loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-400">
-                        No Image
-                      </div>
+                      <div className="aspect-[4/5] bg-slate-100" />
                     )}
-                  </div>
-                  <h3 className="font-serif text-xl text-slate-900 group-hover:text-teal-700 transition-colors">
-                    {work.title}
-                  </h3>
-                  <p className="font-sans text-xs text-slate-400 mt-1">{work.year}</p>
-                </Link>
+                  </Link>
+                  <Link href={`/artworks/${work.slug}`}>
+                    <h3 className="font-serif text-lg text-slate-900 group-hover:text-teal-700 transition-colors leading-snug">
+                      {work.title}
+                    </h3>
+                  </Link>
+                  <p className="font-sans text-xs text-slate-400 mt-0.5 tabular-nums">{work.year}</p>
+                </div>
               ))}
             </div>
           </section>
         )}
-
-        {/* BACK TO GALLERY */}
-        <div className="mt-20 text-center">
-          <Link 
-            href="/artworks"
-            className="inline-flex items-center gap-3 px-8 py-3 border-2 border-slate-900 text-sm font-bold uppercase tracking-widest text-slate-900 hover:bg-slate-900 hover:text-white transition-all duration-300"
-          >
-            ← Back to Gallery
-          </Link>
-        </div>
       </main>
-
     </div>
   );
 }
