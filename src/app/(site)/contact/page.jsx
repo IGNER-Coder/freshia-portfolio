@@ -13,10 +13,10 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-teal-700 selection:text-white">
 
       {/* MASTHEAD */}
-      <header className="px-6 pt-8 pb-12 md:px-16 lg:px-24">
+      <header className="px-6 pt-16 pb-12 md:px-16 lg:px-24">
         <div className="max-w-7xl mx-auto">
           <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-teal-700 mb-6">
-            Vol. 02 — Inquiries
+            Vol. 03 — Inquiries
           </p>
           <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-none mb-6">
             Contact.
