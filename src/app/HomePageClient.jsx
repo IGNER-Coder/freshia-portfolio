@@ -7,7 +7,7 @@ import GlobalNav from '@/app/components/GlobalNav'
 
 export default function HomePage() {
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-full overflow-hidden" style={{ height: '100dvh', minHeight: '100svh' }}>
 
       {/* ── Transparent floating nav — no background, floats over hero image ── */}
       <GlobalNav theme="light" variant="homepage" />
@@ -82,8 +82,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          className="px-6 md:px-12 pointer-events-auto"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 24px) + 32px)' }}
+          className="px-6 md:px-12 pb-14 md:pb-16 pointer-events-auto"
         >
           <div className="flex items-center justify-center md:justify-end w-full">
 
