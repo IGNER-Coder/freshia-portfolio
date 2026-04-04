@@ -82,21 +82,15 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          className="pb-10 md:pb-16 px-6 md:px-12 pointer-events-auto"
+          className="px-6 md:px-12 pointer-events-auto"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 24px) + 32px)' }}
         >
-          <div className="flex items-center justify-between md:justify-end gap-6">
-            {/* Secondary: About — visible on mobile */}
-            <Link
-              href="/about"
-              className="text-white/50 hover:text-white/80 text-xs tracking-widest uppercase font-light transition-colors duration-300 md:hidden"
-            >
-              About
-            </Link>
+          <div className="flex items-center justify-center md:justify-end w-full">
 
-            {/* Decorative line (desktop) */}
-            <div className="hidden md:block flex-1 h-[1px] bg-white opacity-20" />
+            {/* Decorative line (desktop only) */}
+            <div className="hidden md:block flex-1 h-[1px] bg-white opacity-20 mr-6" />
 
-            {/* Primary CTA */}
+            {/* Primary CTA (centered mobile, right desktop) */}
             <Link
               href="/artworks"
               className="group inline-flex items-center text-white opacity-90 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
@@ -106,11 +100,11 @@ export default function HomePage() {
                 whileHover={{ x: 5 }}
                 transition={{ duration: 0.3 }}
               >
-                <span className="text-sm md:text-base tracking-wider font-light">
-                  VIEW GALLERY
+                <span className="text-[11px] md:text-sm tracking-widest font-bold uppercase">
+                  ENTER GALLERY
                 </span>
                 <svg
-                  className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300"
+                  className="w-4 h-4 md:w-5 md:h-5 transform group-hover:translate-x-1 transition-transform duration-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
