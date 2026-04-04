@@ -105,19 +105,10 @@ function ArtworkCard({ art, index }) {
           </p>
         )}
 
-        {/* Status + Enquire */}
+        {/* Status dot only — enquiry happens on the detail page */}
         {art.status && (
-          <div className="flex items-center justify-between gap-2 mt-1.5">
+          <div className="mt-1.5">
             <StatusBadge status={art.status} />
-            {available && (
-              <Link
-                href={`/contact?artwork=${encodeURIComponent(art.title)}`}
-                onClick={e => e.stopPropagation()}
-                className="font-sans text-[11px] font-bold uppercase tracking-widest text-teal-700 hover:text-teal-900 transition-colors duration-200 underline underline-offset-2"
-              >
-                Enquire →
-              </Link>
-            )}
           </div>
         )}
       </div>

@@ -163,9 +163,27 @@ export default async function ArtworkDetailPage({ params }) {
               </ul>
             </div>
 
-            {/* Enquiry CTA */}
+            {/* Enquiry CTA — available works only */}
             <div className="pt-2">
-              <InquiryModal artwork={artwork} />
+              {artwork.status === 'available' ? (
+                <InquiryModal artwork={artwork} />
+              ) : (
+                <div className="border border-slate-200 px-6 py-5 bg-slate-50/60">
+                  <p className="font-sans text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
+                    {artwork.status === 'sold'    && 'This work has been sold'}
+                    {artwork.status === 'private' && 'Private Collection'}
+                    {artwork.status === 'nfs'     && 'Not available for sale'}
+                    {!['sold','private','nfs'].includes(artwork.status) && 'Unavailable'}
+                  </p>
+                  <p className="font-sans text-sm font-light text-slate-500 leading-relaxed">
+                    This piece is no longer available. You are welcome to{' '}
+                    <Link href="/contact" className="underline underline-offset-2 hover:text-teal-700 transition-colors duration-200">
+                      contact the studio
+                    </Link>{' '}
+                    to learn about similar works or upcoming pieces.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Back link */}
