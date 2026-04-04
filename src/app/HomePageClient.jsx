@@ -82,7 +82,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          className="px-6 md:px-12 pb-14 md:pb-16 pointer-events-auto"
+          className="px-6 md:px-12 pb-24 md:pb-16 pointer-events-auto"
         >
           <div className="flex items-center justify-center md:justify-end w-full">
 
