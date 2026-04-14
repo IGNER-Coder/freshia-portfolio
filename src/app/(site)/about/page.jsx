@@ -2,7 +2,6 @@ import AboutMasthead from '../../components/about/AboutMasthead';
 import AchievementBanner from '../../components/about/AchievementBanner';
 import ArtistBiography from '../../components/about/ArtistBiography';
 import CommunityEducation from '../../components/about/CommunityEducation';
-import TechniqueSection from '../../components/about/TechniqueSection';
 import ExhibitionsList from '../../components/about/ExhibitionsList';
 
 export const metadata = {
@@ -12,7 +11,7 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-teal-700 selection:text-white">
+    <div className="min-h-screen bg-[#FAF9F6] text-slate-900 selection:bg-slate-900 selection:text-white">
       {/* MASTHEAD */}
       <AboutMasthead />
 
@@ -28,9 +27,6 @@ export default function AboutPage() {
 
         {/* COMMUNITY IMPACT SECTION */}
         <CommunityEducation />
-
-        {/* TECHNIQUE SECTION */}
-        <TechniqueSection />
 
         {/* RECOGNITION & EXHIBITIONS */}
         <ExhibitionsList />

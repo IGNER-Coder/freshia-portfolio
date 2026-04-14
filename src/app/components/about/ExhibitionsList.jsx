@@ -26,21 +26,28 @@ export default function ExhibitionsList() {
           </p>
         </div>
 
-        {/* Other Exhibitions */}
+        {/* Verified Real Exhibitions */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 py-6 border-b border-slate-200 hover:bg-white transition-colors group">
-          <div className="md:col-span-2 font-sans text-sm font-bold text-teal-700">2026</div>
-          <div className="md:col-span-6 font-serif text-xl text-slate-900 group-hover:text-teal-700 transition-colors">Wajukuu Annual Showcase</div>
-          <div className="md:col-span-4 font-sans text-sm font-light text-slate-500 md:text-right">Nairobi, Kenya</div>
+          <div className="md:col-span-2 font-sans text-sm font-bold text-slate-500">2025</div>
+          <div className="md:col-span-6">
+            <p className="font-serif text-xl text-slate-900 group-hover:text-slate-600 transition-colors">"Image in Our Heads"</p>
+            <p className="font-sans text-xs text-slate-400 mt-1 uppercase tracking-widest">Group Exhibition</p>
+          </div>
+          <div className="md:col-span-4 font-sans text-sm font-light text-slate-500 md:text-right">
+            <p>Wajukuu Artist Collective</p>
+            <p className="text-xs mt-1">& Royal Danish Embassy, Nairobi</p>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 py-6 border-b border-slate-200 hover:bg-white transition-colors group">
-          <div className="md:col-span-2 font-sans text-sm font-bold text-teal-700">2025</div>
-          <div className="md:col-span-6 font-serif text-xl text-slate-900 group-hover:text-teal-700 transition-colors">Echoes of the City (Group)</div>
-          <div className="md:col-span-4 font-sans text-sm font-light text-slate-500 md:text-right">Nairobi National Museum</div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 py-6 border-b border-slate-200 hover:bg-white transition-colors group">
-          <div className="md:col-span-2 font-sans text-sm font-bold text-teal-700">2024</div>
-          <div className="md:col-span-6 font-serif text-xl text-slate-900 group-hover:text-teal-700 transition-colors">Abstract Identities</div>
-          <div className="md:col-span-4 font-sans text-sm font-light text-slate-500 md:text-right">Circle Art Gallery</div>
+          <div className="md:col-span-2 font-sans text-sm font-bold text-slate-500">2024</div>
+          <div className="md:col-span-6">
+            <p className="font-serif text-xl text-slate-900 group-hover:text-slate-600 transition-colors">"Before Our Homes Goes Down"</p>
+            <p className="font-sans text-xs text-slate-400 mt-1 uppercase tracking-widest">Group Exhibition</p>
+          </div>
+          <div className="md:col-span-4 font-sans text-sm font-light text-slate-500 md:text-right">
+            <p>Wajukuu Artist Collective</p>
+            <p className="text-xs mt-1">Nairobi, Kenya</p>
+          </div>
         </div>
       </div>
     </section>

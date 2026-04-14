@@ -65,7 +65,7 @@ export default function ArtistBiography() {
           </div>
         </div>
 
-        <div className="md:col-span-8 font-sans text-lg md:text-xl text-slate-700 font-light leading-loose md:leading-[2.2] space-y-10">
+        <div className="md:col-span-8 font-sans text-base md:text-xl text-slate-700 font-light leading-relaxed md:leading-[2.0] space-y-10">
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp} className="first-letter:float-left first-letter:text-8xl first-letter:pr-4 first-letter:font-serif first-letter:text-teal-800 first-letter:leading-[0.8]">
             As an emerging artist, I have cultivated a rich tapestry of experiences that inform my creative practice through workshops at Wajukuu and extensive self-directed exploration. My artistic journey, marked by a commitment to mixed media, allows me to investigate and articulate the complexities of human experience.
           </motion.p>
