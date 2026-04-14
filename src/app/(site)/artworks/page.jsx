@@ -34,7 +34,7 @@ export default async function ArtworksPage() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-slate-900/10 pb-12">
           <div>
             <p className="font-sans text-xs font-bold uppercase tracking-[0.2em] text-teal-700 mb-6">
-              Vol. 03 — The Archive
+              Vol. 02 — The Archive
             </p>
             <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-none">
               Gallery.

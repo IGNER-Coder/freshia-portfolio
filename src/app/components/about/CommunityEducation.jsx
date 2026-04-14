@@ -1,8 +1,8 @@
 export default function CommunityEducation() {
   return (
-    <section className="mb-32">
+    <section className="mb-16">
       <h3 className="font-serif text-4xl md:text-5xl mb-12">Community & Education</h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="space-y-4">
           <div className="inline-block px-3 py-1 bg-teal-700/10 text-teal-700 text-xs font-bold uppercase tracking-wider mb-2">
@@ -25,5 +25,5 @@ export default function CommunityEducation() {
         </div>
       </div>
     </section>
-  );
+  )
 }
