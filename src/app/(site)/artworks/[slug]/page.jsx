@@ -150,18 +150,7 @@ export default async function ArtworkDetailPage({ params }) {
               </div>
             )}
 
-            {/* Provenance details */}
-            <div className="border-t border-slate-900/8 pt-8">
-              <p className="font-sans text-[10px] font-bold uppercase tracking-widest text-slate-300 mb-4">
-                Provenance
-              </p>
-              <ul className="space-y-2 font-sans text-sm text-slate-500 font-light">
-                <li>Certificate of authenticity included</li>
-                <li>Signed and dated on reverse</li>
-                <li>Ships carefully packaged and insured</li>
-                {artwork.price && <li>Price: {artwork.price}</li>}
-              </ul>
-            </div>
+
 
             {/* Enquiry CTA — available works only */}
             <div className="pt-2">

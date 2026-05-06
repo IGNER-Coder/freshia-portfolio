@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { urlFor } from '@/sanity/lib/image';
 
 /* ── Status helpers ───────────────────────────────────── */
@@ -24,8 +25,7 @@ function StatusBadge({ status }) {
 
 /* ── Single artwork card ──────────────────────────────── */
 function ArtworkCard({ art, index }) {
-  const slug      = art.slug || art._id;
-  const available = art.status === 'available';
+  const slug = art.slug || art._id;
 
   return (
     <motion.div
@@ -105,7 +105,7 @@ function ArtworkCard({ art, index }) {
           </p>
         )}
 
-        {/* Status dot only — enquiry happens on the detail page */}
+        {/* Status */}
         {art.status && (
           <div className="mt-1.5">
             <StatusBadge status={art.status} />
@@ -117,19 +117,47 @@ function ArtworkCard({ art, index }) {
 }
 
 /* ── Year group header ────────────────────────────────── */
-function YearDivider({ year }) {
+function YearDivider({ year, count }) {
   return (
-    <div className="col-span-full flex items-center gap-6 mb-8 mt-4">
+    <div className="col-span-full flex items-center gap-4 mb-8 mt-4">
       <span className="font-serif text-4xl md:text-5xl text-slate-900/10 font-bold select-none leading-none">
         {year}
       </span>
       <div className="flex-1 h-px bg-slate-900/8" />
+      <span className="font-sans text-[9px] font-bold tracking-[0.18em] uppercase text-slate-300">
+        {count} {count === 1 ? 'work' : 'works'}
+      </span>
     </div>
+  );
+}
+
+/* ── Expand / collapse button ─────────────────────────── */
+function ExpandButton({ year, count, visible, expanded, onToggle }) {
+  const hidden = count - visible;
+  if (hidden <= 0) return null;
+  return (
+    <button
+      onClick={() => onToggle(year)}
+      className="w-full flex items-center justify-between px-3 py-2.5 mt-3 mb-1 border border-teal-700/20 bg-teal-700/[0.03] hover:bg-teal-700/[0.07] transition-colors duration-300 group"
+    >
+      <span className="font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-teal-700">
+        {expanded ? `Show less` : `+ ${hidden} more from ${year}`}
+      </span>
+      <span
+        className="font-sans text-[11px] text-teal-700 transition-transform duration-300 group-hover:translate-y-0.5"
+        style={{ display: 'inline-block', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+      >
+        ↓
+      </span>
+    </button>
   );
 }
 
 /* ── Main component ───────────────────────────────────── */
 export default function ArtworksGrid({ artworks }) {
+  const [expanded, setExpanded] = useState({});
+  const toggle = (year) => setExpanded(prev => ({ ...prev, [year]: !prev[year] }));
+
   if (!artworks || artworks.length === 0) {
     return (
       <div className="text-center py-32 px-6">
@@ -147,8 +175,6 @@ export default function ArtworksGrid({ artworks }) {
   }, {});
 
   const years = Object.keys(byYear).sort((a, b) => b - a);
-
-  /* Total count */
   const total = artworks.length;
 
   return (
@@ -159,19 +185,102 @@ export default function ArtworksGrid({ artworks }) {
         {total} {total === 1 ? 'painting' : 'paintings'} in the archive
       </p>
 
-      {years.map((year) => (
-        <div key={year}>
-          {/* Year divider */}
-          <YearDivider year={year} />
+      {years.map((year) => {
+        const works          = byYear[year];
+        const isExpanded     = !!expanded[year];
+        const heroCard       = works[0];
+        const secondRowCards = works.slice(1, 3);
+        const hiddenCards    = works.slice(3);
 
-          {/* Masonry grid for this year's works */}
-          <div className="columns-2 lg:columns-3 gap-6 md:gap-10">
-            {byYear[year].map((art, i) => (
-              <ArtworkCard key={art._id} art={art} index={i} />
-            ))}
+        return (
+          <div key={year} className="mb-16">
+            <YearDivider year={year} count={works.length} />
+
+            {/* ── MOBILE layout (hidden on lg) ── */}
+            <div className="lg:hidden">
+              {/* Hero — full width */}
+              <ArtworkCard art={heroCard} index={0} />
+
+              {/* Second row — 2-col */}
+              {secondRowCards.length > 0 && (
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                  {secondRowCards.map((art, i) => (
+                    <ArtworkCard key={art._id} art={art} index={i + 1} />
+                  ))}
+                </div>
+              )}
+
+              {/* Expand button */}
+              <ExpandButton
+                year={year}
+                count={works.length}
+                visible={3}
+                expanded={isExpanded}
+                onToggle={toggle}
+              />
+
+              {/* Hidden cards — expand inline */}
+              <AnimatePresence>
+                {isExpanded && hiddenCards.length > 0 && (
+                  <motion.div
+                    key={`expand-${year}`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                      {hiddenCards.map((art, i) => (
+                        <ArtworkCard key={art._id} art={art} index={i + 3} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* ── DESKTOP layout (hidden below lg) ── */}
+            <div className="hidden lg:block">
+              {/* First 3 — always visible */}
+              <div className="grid grid-cols-3 gap-10">
+                {works.slice(0, 3).map((art, i) => (
+                  <ArtworkCard key={art._id} art={art} index={i} />
+                ))}
+              </div>
+
+              {/* Expand button */}
+              <ExpandButton
+                year={year}
+                count={works.length}
+                visible={3}
+                expanded={isExpanded}
+                onToggle={toggle}
+              />
+
+              {/* Hidden cards */}
+              <AnimatePresence>
+                {isExpanded && works.slice(3).length > 0 && (
+                  <motion.div
+                    key={`expand-desktop-${year}`}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    style={{ overflow: 'hidden' }}
+                  >
+                    <div className="grid grid-cols-3 gap-10 mt-6">
+                      {works.slice(3).map((art, i) => (
+                        <ArtworkCard key={art._id} art={art} index={i + 3} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </section>
   );
 }

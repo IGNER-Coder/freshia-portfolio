@@ -3,6 +3,7 @@ import AchievementBanner from '../../components/about/AchievementBanner';
 import ArtistBiography from '../../components/about/ArtistBiography';
 import CommunityEducation from '../../components/about/CommunityEducation';
 import ExhibitionsList from '../../components/about/ExhibitionsList';
+import PublicationsList from '../../components/about/PublicationsList';
 
 export const metadata = {
   title: 'About | Freshia Njeri',
@@ -30,7 +31,10 @@ export default function AboutPage() {
 
         {/* RECOGNITION & EXHIBITIONS */}
         <ExhibitionsList />
+
+        {/* PRESS & PUBLICATIONS */}
+        <PublicationsList />
       </main>
     </div>
   );
-}
+}

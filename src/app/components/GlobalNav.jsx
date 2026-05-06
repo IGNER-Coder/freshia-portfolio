@@ -256,10 +256,11 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
   const pathname = usePathname()
 
   const navItems = [
-    { label: 'Home',     href: '/' },
-    { label: 'About',    href: '/about' },
-    { label: 'Artworks', href: '/artworks' },
-    { label: 'Contact',  href: '/contact' },
+    { label: 'Home',         href: '/' },
+    { label: 'About',        href: '/about' },
+    { label: 'Artworks',     href: '/artworks' },
+    { label: 'Press',        href: '/publications' },
+    { label: 'Contact',      href: '/contact' },
   ]
 
   /* Clock */
