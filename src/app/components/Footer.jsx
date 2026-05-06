@@ -65,6 +65,21 @@ export default function Footer() {
             © {currentYear} Freshia Njeri. All rights reserved.
           </p>
         </div>
+
+        {/* Studio credit */}
+        <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-center">
+          <p className="font-sans text-[10px] text-white/20 tracking-widest uppercase">
+            Designed &amp; built by{' '}
+            <a
+              href="https://kinastudio.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/30 hover:text-teal-400 transition-colors duration-300"
+            >
+              Kina Studio
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   )
