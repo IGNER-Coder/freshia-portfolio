@@ -259,6 +259,7 @@ export default function GlobalNav({ theme = 'light', variant = 'homepage' }) {
     { label: 'Home',         href: '/' },
     { label: 'About',        href: '/about' },
     { label: 'Artworks',     href: '/artworks' },
+    { label: 'Exhibitions',  href: '/exhibitions' },
     { label: 'Press',        href: '/publications' },
     { label: 'Contact',      href: '/contact' },
   ]

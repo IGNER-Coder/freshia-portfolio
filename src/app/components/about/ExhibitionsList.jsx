@@ -3,11 +3,6 @@ import { ArrowUpRight } from 'lucide-react';
 export default function ExhibitionsList() {
   return (
     <section className="mb-32">
-      <div className="flex items-baseline justify-between mb-12 border-b-2 border-slate-900/20 pb-4">
-        <h3 className="font-serif text-4xl md:text-5xl">Recognition &amp; Exhibitions</h3>
-        <span className="font-sans text-xs uppercase tracking-widest text-slate-400">Archive</span>
-      </div>
-
       <div className="flex flex-col">
         {/* Documenta - Featured */}
         <a

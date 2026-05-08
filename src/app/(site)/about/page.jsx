@@ -2,7 +2,6 @@ import AboutMasthead from '../../components/about/AboutMasthead';
 import AchievementBanner from '../../components/about/AchievementBanner';
 import ArtistBiography from '../../components/about/ArtistBiography';
 import CommunityEducation from '../../components/about/CommunityEducation';
-import ExhibitionsList from '../../components/about/ExhibitionsList';
 import PublicationsList from '../../components/about/PublicationsList';
 
 export const metadata = {
@@ -29,8 +28,7 @@ export default function AboutPage() {
         {/* COMMUNITY IMPACT SECTION */}
         <CommunityEducation />
 
-        {/* RECOGNITION & EXHIBITIONS */}
-        <ExhibitionsList />
+        {/* RECOGNITION & EXHIBITIONS - Moved to own page */}
 
         {/* PRESS & PUBLICATIONS */}
         <PublicationsList />
